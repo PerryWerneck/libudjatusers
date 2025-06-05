@@ -12,6 +12,8 @@ src/library/os/windows/sessiondeinit.cc
 src/library/os/windows/sessioninit.cc
 src/library/session.cc
 src/library/alert.cc
-src/module/controller.cc
 src/module/init.cc
-src/module/session.cc
+src/include/udjat/agent/user.h
+src/include/udjat/tools/user/session.h
+src/include/udjat/tools/user/list.h
+src/include/private/linux.h

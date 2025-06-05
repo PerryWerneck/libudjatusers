@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-06 22:41-0300\n"
+"POT-Creation-Date: 2025-06-05 07:38-0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: \n"
@@ -14,7 +14,7 @@ msgstr ""
 
 #: src/library/events.cc:36
 msgid "Already active"
-msgstr ""
+msgstr "Já estava ativo"
 
 #: src/library/events.cc:36
 msgid "Session is active on startup"
@@ -22,7 +22,7 @@ msgstr "Sessão está ativa no início do serviço"
 
 #: src/library/events.cc:37
 msgid "Still active"
-msgstr ""
+msgstr "Continua ativo"
 
 #: src/library/events.cc:37
 msgid "Session still active on shutdown"
@@ -46,7 +46,7 @@ msgstr "Usuário encerrou sessão"
 
 #: src/library/events.cc:40
 msgid "Lock"
-msgstr ""
+msgstr "Bloquear"
 
 #: src/library/events.cc:40
 msgid "Session was locked"
@@ -54,7 +54,7 @@ msgstr "Sessão foi bloqueada"
 
 #: src/library/events.cc:41
 msgid "Unlock"
-msgstr ""
+msgstr "Desbloquear"
 
 #: src/library/events.cc:41
 msgid "Session was unlocked"
