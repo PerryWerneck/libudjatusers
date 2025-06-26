@@ -17,6 +17,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
+ #include <config.h>
+ #include <udjat/defs.h>
+ #include <udjat/loader.h>
+ #include <udjat/module/abstract.h>
+ #include <iostream>
+
+ using namespace Udjat;
+ using namespace std;
+
+ int main(int argc, char **argv) {
+	return loader(argc,argv,[](Application &app) {
+
+		debug("Initializing " PACKAGE_NAME "...");
+		udjat_module_init();
+		debug("... initilization of " PACKAGE_NAME " is complete");
+
+
+	});
+ }
+
+ /*
  #include <config.h>
  #include <udjat/defs.h>
  #include <udjat/tests.h>
@@ -39,3 +61,4 @@
 
  }
 
+ */

@@ -40,11 +40,11 @@
 
 	protected:
 
-		std::shared_ptr<Abstract::Agent> AgentFactory(const Abstract::Object &, const XML::Node &node) const override {
+		std::shared_ptr<Abstract::Agent> AgentFactory(const Abstract::Agent &, const XML::Node &node) const override {
 			return make_shared<User::Agent>(node);
 		}
 
-	public:
+	public:  	
 
 		Module() 
 			: Udjat::Module("users",modinfo), 

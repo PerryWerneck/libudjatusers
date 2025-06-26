@@ -276,13 +276,13 @@ static_library(
 )
 
 executable(
-  'userstest',
+  meson.project_name(),
   config_src + test_src,
   install: false,
   link_with : [ dynamic, module ],
   dependencies: lib_deps,
   include_directories: includes_dir,
-  link_args: [ '-l:libudjat-testing.a' ],
+  link_args: [ '-l:libudjat-loader.a' ],
 )
 
 install_headers(
