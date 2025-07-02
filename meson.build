@@ -266,13 +266,22 @@ else
 
 endif
 
-static_library(
-  meson.project_name(), 
-  config_src + lib_src,
-  cpp_args: [ '-DSTATIC_LIBRARY', '-fno-lto' ],
-  install: true,
+static_library = declare_dependency(
+  link_with: static_library(
+    meson.project_name(), 
+    config_src + lib_src,
+    cpp_args: [ '-DSTATIC_LIBRARY', '-fno-lto' ],
+    install: true,
+    dependencies: lib_deps,
+    include_directories: includes_dir
+  ),
   dependencies: lib_deps,
   include_directories: includes_dir
+)
+
+dynamic_library = declare_dependency(
+  link_with: dynamic,
+  include_directories: includes_dir,
 )
 
 executable(
