@@ -290,8 +290,7 @@ executable(
   install: false,
   link_with : [ dynamic, module ],
   dependencies: lib_deps,
-  include_directories: includes_dir,
-  link_args: [ '-l:libudjat-loader.a' ],
+  include_directories: includes_dir
 )
 
 install_headers(
