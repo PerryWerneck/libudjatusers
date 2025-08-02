@@ -28,13 +28,12 @@
  using namespace std;
 
  int main(int argc, char **argv) {
-	return loader(argc,argv,[](Application &app) {
+	return loader(argc,argv,[](Application &app) -> int {
 
 		debug("Initializing " PACKAGE_NAME "...");
 		udjat_module_init();
 		debug("... initilization of " PACKAGE_NAME " is complete");
-
-
+		return 0;
 	});
  }
 
