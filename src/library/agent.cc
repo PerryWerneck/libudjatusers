@@ -173,7 +173,12 @@ inline std::string n2hexstr(I w, size_t hex_len = sizeof(I)<<1) {
 #endif 
 */
 
-	bool User::Agent::push_back(const XML::Node &node, std::shared_ptr<Activatable> activatable){
+	bool User::Agent::push_back(const XML::Node &node, std::shared_ptr<Abstract::Object> object){
+
+		auto activatable = std::dynamic_pointer_cast<Activatable>(object);
+		if(!activatable) {
+			return super::push_back(node,object);
+		}
 
 		String trigger{node,"trigger-event"};
 		if(trigger.empty()) {

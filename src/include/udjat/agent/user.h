@@ -86,7 +86,7 @@
 			/// @param node The activatable description.
 			/// @param activatable The activatable built for this event.
 			/// @return true if the event was pushed.
-			bool push_back(const pugi::xml_node &node, std::shared_ptr<Activatable> activatable) override;
+			bool push_back(const pugi::xml_node &node, std::shared_ptr<Abstract::Object> object) override;
 
 			Value & get(Value &value) const override;
 
