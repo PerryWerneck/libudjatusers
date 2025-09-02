@@ -63,7 +63,7 @@
 		/// @brief Create an event id.
 		/// @param names The list of event names delimited by ','
 		/// @return The event id mixing all names.
-		UDJAT_API Event EventFactory(const pugi::xml_node &node);
+		// UDJAT_API Event EventFactory(const pugi::xml_node &node);
 
 		/// @brief Session state, as reported by logind.
 		/// @see sd_session_get_state
@@ -113,6 +113,8 @@
 
 #endif // _WIN32
 
+			time_t last_activity = 0;			///< @brief Timestamp of last activity on this session (for idle control).
+
 		protected:
 			/// @brief Emit event, update timers.
 			void emit(const Event &event) noexcept;
@@ -124,8 +126,41 @@
 			void deinit();
 
 		public:
+
+			/// @brief Session type;
+			enum Type : uint16_t {
+				System 			= 0x0001,	///< @brief Activate on system sessions?
+				User			= 0x0002,	///< @brief Activate on user sessions?
+				Remote 			= 0x0004,	///< @brief Activate on remote sessions?
+				Local 			= 0x0008,	///< @brief Activate on remote sessions?
+				Locked 			= 0x0010,	///< @brief Activate on locked session?
+				Unlocked		= 0x0020,	///< @brief Activate on unlocked session?
+				Background		= 0x0040,	///< @brief Activate on background session?
+				Foreground		= 0x0080,	///< @brief Activate on foreground session?
+				Active			= 0x0100,	///< @brief Activate on active session?
+				Inactive		= 0x0200,	///< @brief Activate on inactive session?
+				All				= 0xFFFF
+			};
+
+			static Type TypeFactory(const XML::Node &node);
+
 			Session();
 			virtual ~Session();
+
+			inline void activity(time_t tm) noexcept {
+				last_activity = tm;
+			}
+
+#ifdef _WIN32
+			std::string id() const noexcept;
+#else
+			inline const std::string &id() const noexcept {
+				return sid;
+			}
+#endif
+			inline time_t activity() const noexcept {
+				return last_activity;
+			}
 
 			/// @brief Get session name or id.
 			std::string to_string() const noexcept override;
@@ -136,6 +171,11 @@
 
 			bool getProperty(const char *key, std::string &value) const override;
 			Value & getProperties(Value &value) const override;
+
+			/// @brief Test session type.
+			/// @param type The type with options to check.
+			/// @return true if the session flags match the filter.
+			bool test(const Session::Type filter) const;
 
 			/// @brief Is this session a remote one?
 			bool remote() const;
@@ -166,6 +206,8 @@
 				return flags.alive;
 			}
 
+
+
 #ifdef _WIN32
 
 			/// @brief Get user's domain
@@ -188,16 +230,13 @@
 			const char * classname() const noexcept;
 
 			/// @brief The D-Bus session path.
-			std::string path() const;
+			const char * path() const;
 
 			/// @brief Get environment value from user session.
 			std::string getenv(const char *varname) const;
 
 			/// @brief Execute function as user's effective id.
-			static void call(const uid_t uid, const std::function<void()> exec);
-
-			/// @brief Execute function as user's effective id.
-			void call(const std::function<void()> exec);
+			int exec(const std::function<int()> &exec) const;
 
 #endif // _WIN32
 
@@ -207,6 +246,10 @@
  }
 
  namespace std {
+
+	UDJAT_API const char * to_string(const Udjat::User::State state) noexcept;
+
+	UDJAT_API string to_string(const Udjat::User::Session::Type type);
 
 	UDJAT_API const std::string to_string(const Udjat::User::Event event, bool description = false) noexcept;
 
@@ -222,6 +265,7 @@
 		return session->to_string();
 	}
 
+
 	inline ostream& operator<< (ostream& os, const Udjat::User::Session &session) {
 		return os << session.to_string();
 	}
@@ -230,11 +274,8 @@
 		return os << session->to_string();
 	}
 
-	UDJAT_API const char * to_string(const Udjat::User::State state) noexcept;
-
 	inline ostream& operator<< (std::ostream& os, const Udjat::User::State state) {
-		return os << to_string(state);
+		return os << std::to_string(state);
 	}
 
  }
-

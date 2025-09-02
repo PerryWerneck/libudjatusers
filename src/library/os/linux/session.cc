@@ -18,7 +18,7 @@
  */
 
  #include <config.h>
- #include "private.h"
+ #include <udjat/defs.h>
  #include <systemd/sd-login.h>
  #include <systemd/sd-bus.h>
  #include <udjat/tools/configuration.h>
@@ -32,16 +32,21 @@
  #include <mutex>
  #include <udjat/tools/logger.h>
  #include <udjat/tools/quark.h>
+ #include <udjat/tools/user/session.h>
+ #include <udjat/tools/user/list.h>
 
-#ifdef HAVE_DBUS
-	#include <udjat/tools/dbus.h>
-#endif // HAVE_DBUS
+ #ifdef HAVE_DBUS
+	#include <udjat/tools/dbus/defs.h>
+	#include <udjat/tools/dbus/connection.h>
+	#include <udjat/tools/dbus/message.h>
+ #endif // HAVE_DBUS
 
  using namespace std;
 
  namespace Udjat {
 
 	User::Session::Session() {
+		last_activity = time(0);
 		User::List::getInstance().push_back(this);
 	}
 
@@ -92,138 +97,51 @@
 
 	}
 
-	std::string User::Session::path() const {
+	const char * User::Session::path() const {
 
-		if(!dbpath.empty()) {
-			return dbpath;
+		if(dbpath.empty()) {
+
+			// Dont have session path, get it and save for next calls.
+
+			DBus::SystemBus::getInstance().call_and_wait(
+				DBus::Message{
+					"org.freedesktop.login1",
+					"/org/freedesktop/login1",
+					"org.freedesktop.login1.Manager",
+					"GetSession",
+					sid.c_str()
+				},
+				[&](DBus::Message & message) -> void {
+					message.except();
+					message.pop(const_cast<User::Session *>(this)->dbpath);
+				}
+			);
 		}
 
-		sd_bus* bus = NULL;
-		int rc;
-
-		rc = sd_bus_open_system(&bus);
-		if(rc < 0) {
-
-			throw system_error(-rc,system_category(),string{"Unable to open system bus (rc="}+std::to_string(rc)+")");
-		}
-
-		sd_bus_error error = SD_BUS_ERROR_NULL;
-		sd_bus_message *reply = NULL;
-
-		std::string response;
-
-		try {
-
-			rc = sd_bus_call_method(
-							bus,
-							"org.freedesktop.login1",
-							"/org/freedesktop/login1",
-							"org.freedesktop.login1.Manager",
-							"GetSession",
-							&error,
-							&reply,
-							"s", sid.c_str()
-						);
-
-			if(rc < 0) {
-				string message{error.message};
-				sd_bus_error_free(&error);
-				throw system_error(-rc,system_category(),message);
-			} else if(!reply) {
-				throw runtime_error("No reply from org.freedesktop.login1.Manager.GetSession");
-			}
-
-			const char *path = NULL;
-			rc = sd_bus_message_read_basic(reply,SD_BUS_TYPE_OBJECT_PATH,&path);
-			if(rc < 0) {
-				sd_bus_message_unref(reply);
-				throw system_error(-rc,system_category(),"org.freedesktop.login1.Manager.GetSession");
-
-			}
-			if(!(path && *path)) {
-				sd_bus_message_unref(reply);
-				throw runtime_error("Empty response from org.freedesktop.login1.Manager.GetSession");
-			}
-
-			response = path;
-			trace() << "D-Bus Session path for @" << sid << " is " << response << endl;
-
-			sd_bus_message_unref(reply);
-
-			User::Session *session = const_cast<User::Session *>(this);
-			if(session) {
-				session->dbpath = response;
-			}
-
-		} catch(...) {
-
-			sd_bus_unref(bus);
-			throw;
-
-		}
-
-		sd_bus_unref(bus);
-
-		return response;
+		return dbpath.c_str();
 
 	}
 
 	bool User::Session::locked() const {
 
-		int hint = 0;
-		int rc = 0;
-		sd_bus* bus = NULL;
-		sd_bus_error error = SD_BUS_ERROR_NULL;
-		sd_bus_message *reply = NULL;
-
-		rc = sd_bus_open_system(&bus);
-		if(rc < 0) {
-
-			throw system_error(-rc,system_category(),string{"Unable to open system bus (rc="}+std::to_string(rc)+")");
-		}
-
-		try {
-
-			rc = sd_bus_call_method(
-							bus,
-							"org.freedesktop.login1",
-							this->path().c_str(),
-							"org.freedesktop.DBus.Properties",
-							"Get",
-							&error,
-							&reply,
-							"ss", "org.freedesktop.login1.Session", "LockedHint"
-						);
-
-			if(rc < 0) {
-				throw system_error(-rc,system_category(),Logger::Message(error.message," (rc=",-rc,")"));
-			} else if(!reply) {
-				throw runtime_error("Empty response from org.freedesktop.login1.LockedHint");
-			} else {
-
-				// Get reply.
-				if(sd_bus_message_read(reply,"v","b",&hint) < 0) {
-					throw system_error(-rc,system_category(),"Can't read response from org.freedesktop.login1.LockedHint");
-				}
-
+		bool locked = false;
+		DBus::SystemBus::getInstance().call_and_wait(
+			DBus::Message{
+				"org.freedesktop.login1",
+				this->path(),
+				"org.freedesktop.DBus.Properties",
+				"Get",
+				"org.freedesktop.login1.Session",
+				"LockedHint"
+			},
+			[&](DBus::Message & message) -> void {
+				message.except();
+				message.pop(locked);
+				debug("Session is",(locked ? "locked" : "unlocked"));
 			}
+		);
 
-		} catch(...) {
-			if(reply) {
-				sd_bus_message_unref(reply);
-			}
-			sd_bus_error_free(&error);
-			sd_bus_unref(bus);
-			throw;
-		}
-
-		sd_bus_error_free(&error);
-		if(reply) {
-			sd_bus_message_unref(reply);
-		}
-		sd_bus_unref(bus);
-
-		return (hint != 0);
+		return locked;
 
 	}
 
@@ -340,31 +258,8 @@
 		return session->uid;
 	}
 
-	void User::Session::call(const std::function<void()> exec) {
-		call(userid(),exec);
-	}
-
-	void User::Session::call(const uid_t uid, const std::function<void()> exec) {
-
-		static mutex guard;
-		lock_guard<mutex> lock(guard);
-
-		uid_t saved_uid = geteuid();
-		if(seteuid(uid) < 0) {
-			throw std::system_error(errno, std::system_category(), "Cant set effective user id");
-		}
-
-		try {
-
-			exec();
-
-		} catch(...) {
-			seteuid(saved_uid);
-			throw;
-		}
-
-		seteuid(saved_uid);
-
+	int User::Session::exec(const std::function<int()> &exec) const {
+		return DBus::UserBus::exec(uid,exec);
 	}
 
 	const char * User::Session::name(bool update) const noexcept {

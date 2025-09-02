@@ -24,6 +24,8 @@
  #pragma once
  #include <config.h>
  #include <udjat/defs.h>
+ #include <udjat/tools/user/session.h>
+ #include <udjat/tools/service.h>
 
  namespace Udjat {
 
@@ -32,7 +34,7 @@
 		class Agent;
 
 		/// @brief Singleton with the user's list.
-		class UDJAT_API List {
+		class UDJAT_API List : private Udjat::Service {
 		private:
 
 			std::recursive_mutex guard;
@@ -54,6 +56,10 @@
 
 			/// @brief Deinitialize session.
 			void deinit(Session &session);
+
+			// Udjat::Service
+			void start() override;
+			void stop() override;
 
 #ifdef _WIN32
 
@@ -78,8 +84,8 @@
 
 			void wakeup();
 
-			class Bus;
-			std::shared_ptr<Bus> systembus;		///< @brief Connection with the system bus
+			// D-Bus listeners;
+			void * listeners[6];
 
 #endif // _WIN32
 
@@ -93,7 +99,7 @@
 			void shutdown();
 
 			/// @brief Update session list from system.
-			void refresh() noexcept;
+			//void refresh() noexcept;
 
 			List();
 
@@ -101,6 +107,10 @@
 
 			List(Controller &) = delete;
 			List(Controller *) = delete;
+
+#ifdef _WIN32
+			void refresh() noexcept;
+#endif // _WIN32
 
 			static List & getInstance();
 

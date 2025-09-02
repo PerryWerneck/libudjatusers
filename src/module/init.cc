@@ -18,67 +18,77 @@
  */
 
  #include <config.h>
- #include "private.h"
- #include <udjat/module.h>
- #include <udjat/worker.h>
- #include <udjat/request.h>
+ #include <udjat/defs.h>
+ #include <udjat/module/abstract.h>
+ #include <udjat/agent/abstract.h>
+ #include <udjat/tools/actions/abstract.h>
+ #include <udjat/tools/report.h>
  #include <udjat/moduleinfo.h>
- #include <udjat/version.h>
  #include <udjat/agent/user.h>
  #include <udjat/tools/user/list.h>
 
  using namespace std;
+ using namespace Udjat;
 
  /// @brief Register udjat module.
  Udjat::Module * udjat_module_init() {
 
-	static const Udjat::ModuleInfo modinfo{"Users management module"};
+	static const ModuleInfo modinfo{"Users management module"};
 
-	class Module : public Udjat::Module, private Udjat::Worker, private Udjat::Factory, private Udjat::Service {
+	class Module : public Udjat::Module, private Abstract::Agent::Factory, private Action::Factory {
 	private:
 
 	protected:
 
-		std::shared_ptr<Abstract::Agent> AgentFactory(const Abstract::Object &, const XML::Node &node) const override {
+		std::shared_ptr<Abstract::Agent> AgentFactory(const Abstract::Agent &, const XML::Node &node) const override {
 			return make_shared<User::Agent>(node);
 		}
 
-	public:
+	public:  	
 
-		Module() : Udjat::Module("users",modinfo), Udjat::Worker("userlist",modinfo), Udjat::Factory("users",modinfo), Udjat::Service("userlist",modinfo) {
+		Module() 
+			: Udjat::Module("users",modinfo), 
+				Abstract::Agent::Factory("users"),
+				Action::Factory("users") {
+
+			// Get User list singleton.
+			User::List::getInstance();
+
 		};
 
 		virtual ~Module() {
 		}
 
-		void start() override {
-			User::List::getInstance().activate();
+		std::shared_ptr<Action> ActionFactory(const XML::Node &node) const {
+
+			class UserListAction : public Udjat::Action {
+			public:
+				UserListAction(const XML::Node &node) : Udjat::Action{node} {
+				}
+
+				virtual ~UserListAction() {
+				}
+
+				int call(Udjat::Request &request, Udjat::Response &response, bool except) {
+					return exec(response,except,[&](){
+
+						auto &report = response.ReportFactory("name","remote","locked","active","state",nullptr);
+						for(auto session : User::List::getInstance()) {
+							report.push_back(session->to_string());
+							report.push_back(session->remote());
+							report.push_back(session->locked());
+							report.push_back(session->active());
+							report.push_back(std::to_string(session->state()));
+						}
+
+						return 0;
+					});
+				}
+
+			};
+
+			return make_shared<UserListAction>(node);
 		}
-
-		void stop() override {
-			User::List::getInstance().deactivate();
-		}
-
-#if UDJAT_CHECK_VERSION(1,2,0)
-		bool get(Request &, Response::Value &response) const override {
-
-			response.reset(Value::Array);
-
-			for(auto session : User::List::getInstance()) {
-
-				Udjat::Value &row = response.append(Value::Object);
-
-				row["name"] = session->to_string();
-				row["remote"] = session->remote();
-				row["locked"] = session->locked();
-				row["active"] = session->active();
-				row["state"] = std::to_string(session->state());
-
-			}
-
-			return true;
-		}
-#endif // UDJAT_CHECK_VERSION
 
 	};
 

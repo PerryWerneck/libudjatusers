@@ -17,16 +17,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- /*
+ #pragma once
+
  #include <config.h>
  #include <udjat/defs.h>
- #include <udjat/agent/user.h>
  #include <udjat/tools/user/session.h>
  #include <udjat/tools/user/list.h>
 
  namespace Udjat {
 
-
  }
- */
+
 

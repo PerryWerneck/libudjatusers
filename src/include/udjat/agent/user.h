@@ -24,27 +24,44 @@
  #pragma once
  #include <udjat/defs.h>
  #include <udjat/tools/xml.h>
- #include <udjat/tools/user/session.h>
  #include <udjat/agent/abstract.h>
- #include <udjat/request.h>
- #include <udjat/tools/value.h>
- #include <list>
-
+ #include <udjat/tools/activatable.h>
+ #include <udjat/tools/user/session.h>
+				
  namespace Udjat {
 
 	namespace User {
 
-		class Alert;
-
 		class UDJAT_API Agent : public Udjat::Abstract::Agent {
 		private:
 
-			std::list<Alert> proxies;
+			/// @brief Proxy for activatables parsing user filters.
+			struct Proxy {
+
+				User::Event events = User::no_event;
+				Session::Type filter = Session::All;
+
+#ifndef _WIN32
+				const char *classname = nullptr;
+				const char *servicename = nullptr;
+#endif // !_WIN32
+
+				std::shared_ptr<Activatable> activatable;	///< @brief The activatable for this event.
+
+				time_t timer = 0;	///< @brief Session idle time to emit 'pulse' events (if enabled).
+
+				Proxy(const XML::Node &node, const User::Event event, std::shared_ptr<Activatable> activatable);
+
+				void activate(const User::Session &session, const Abstract::Object &agent) const noexcept;
+
+			};
+
+			std::list<Proxy> proxies;
 
 			/// @brief Timestamp of the last alert emission.
 			time_t alert_timestamp = time(0);
 
-			void emit(Abstract::Alert &alert, Session &session) const noexcept;
+			void emit(Udjat::Activatable &activatable, Session &session) const noexcept;
 
 			struct {
 				unsigned int max_pulse_check = 600;	///< @brief Max value for pulse checks.
@@ -65,13 +82,15 @@
 			/// @return true if an alert was activated.
 			bool onEvent(Session &session, const Udjat::User::Event event) noexcept;
 
+			/// @brief Check XML for special user events, add it on proxy list if necessary.
+			/// @param node The activatable description.
+			/// @param activatable The activatable built for this event.
+			/// @return true if the event was pushed.
 			bool push_back(const pugi::xml_node &node, std::shared_ptr<Activatable> activatable) override;
 
 			Value & get(Value &value) const override;
 
-			Value & getProperties(Value &value) const override;
 			bool getProperties(const char *path, Value &value) const override;
-			bool getProperties(const char *path, Report &report) const override;
 
 			/// @brief Get Agent value (seconds since last alert);
 			time_t get() const noexcept;

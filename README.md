@@ -1,8 +1,9 @@
 # User/Session monitor and library for udjat.
 
+![Platform: Linux/Windows](https://img.shields.io/badge/Platform-Linux/Windows-blue.svg)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![CodeQL](https://github.com/PerryWerneck/udjat-module-users/workflows/CodeQL/badge.svg?branch=master)
-[![build result](https://build.opensuse.org/projects/home:PerryWerneck:udjat/packages/udjat-module-users/badge.svg?type=percent)](https://build.opensuse.org/package/show/home:PerryWerneck:udjat/udjat-module-users)
+[![CodeQL Advanced](https://github.com/PerryWerneck/libudjatusers/actions/workflows/codeql.yml/badge.svg)](https://github.com/PerryWerneck/libudjatusers/actions/workflows/codeql.yml)
+[![build result](https://build.opensuse.org/projects/home:PerryWerneck:udjat/packages/libudjatusers/badge.svg?type=percent)](https://build.opensuse.org/package/show/home:PerryWerneck:udjat/libudjatusers)
 
 Watch active users sessions emitting UDJAT alerts (http call, script, etc) based on user's session events.
 
@@ -38,14 +39,14 @@ Watch active users sessions emitting UDJAT alerts (http call, script, etc) based
 	<module name='users' required='yes' />
 	
 	<!-- Declare an user monitor agent -->
-	<users name='users' update-timer='60'>
+	<agent type='users' name='users' update-timer='60'>
 
-		<!-- The XML text block contains the post payload -->
-		<alert name='logout' event='logout' max-retries='1' action='post' url='http://localhost'>
+		<!-- Do an HTTP post when user screen is locked -->
+		<script type='url' name='lock' trigger-event='lock' action='post' url='http://localhost'>
 			{"user":"${username}","macaddress":"${macaddress}"}
-		</alert>
+		</script>
 
-	</users>
+	</agent>
 	
 </config>
 ```
