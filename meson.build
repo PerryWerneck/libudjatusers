@@ -46,7 +46,13 @@ subdir('po')
 #
 # Required libraries
 #
-libudjat = dependency('libudjat') 
+libudjat = dependency(
+  'libudjat',
+  required: true, 
+  version: '>=2.0.0',
+  fallback: ['libudjat', 'static_library'],
+)
+
 lib_deps = [
   libudjat,
 ]
@@ -159,6 +165,7 @@ else
   pkg.generate(
     name: 'lib' + meson.project_name(),
     description: project_description,
+    requires_private: [ 'libudjatdbus' ],
     libraries: [ '-l' + meson.project_name() ]
   )
 
@@ -178,7 +185,11 @@ else
 
   app_conf.set('HAVE_DBUS', 1)
   lib_deps += [
-    dependency('libudjatdbus'),
+    dependency(
+      'libudjatdbus',
+      required: true, 
+      fallback: ['libudjatdbus', 'static_library'],
+    ),
     dependency('libsystemd'),
   ]
 
