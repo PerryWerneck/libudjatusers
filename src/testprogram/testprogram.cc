@@ -33,6 +33,7 @@
  using namespace std;
 
  int main(int argc, char **argv) {
+
 	return loader(argc,argv,[](Application &app) -> int {
 
 		debug("Initializing " PACKAGE_NAME "...");

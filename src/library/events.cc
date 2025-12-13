@@ -57,7 +57,7 @@
 		for(auto name : names) {
 
 			name.strip();
-			debug("User::EventFactory: processing event name '%s'", name.c_str());
+			debug("User::EventFactory: processing event name '", name.c_str(), "'");
 
 			for(size_t ix = 0; ix < (sizeof(events)/sizeof(events[0])); ix++) {
 				if(!strcasecmp(name.c_str(),events[ix].name)) {
@@ -76,6 +76,7 @@
 
 		}
 
+		debug("User::EventFactory: returning event mask '", n2hexstr((uint16_t) rc).c_str(), "'");
 		return (User::Event) rc;
 
 	}
