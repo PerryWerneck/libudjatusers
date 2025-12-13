@@ -57,6 +57,7 @@
 		for(auto name : names) {
 
 			name.strip();
+			debug("User::EventFactory: processing event name '%s'", name.c_str());
 
 			for(size_t ix = 0; ix < (sizeof(events)/sizeof(events[0])); ix++) {
 				if(!strcasecmp(name.c_str(),events[ix].name)) {
@@ -78,29 +79,6 @@
 		return (User::Event) rc;
 
 	}
-
-	/*
-	Udjat::User::Event User::EventFactory(const pugi::xml_node &node) {
-
-		const char * names = node.attribute("events").as_string();
-
-		if(!*names) {
-			names = node.attribute("event").as_string();
-		}
-
-		if(!*names) {
-			// Last resource, use the alert name.
-			names = node.attribute("name").as_string();
-		}
-
-		if(!*names) {
-			throw runtime_error("Required attribute 'events' is missing");
-		}
-
-		return Udjat::User::EventFactory(names);
-
-	}
-	*/
 
  }
 

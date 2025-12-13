@@ -20,12 +20,12 @@
 project(
 	'udjatusers', 
 	['cpp'],
-	version: '2.1.0',
-	default_options : ['c_std=c11', 'cpp_std=c++17'],
+	version: '2.1.1',
+	default_options : ['c_std=c11', 'cpp_std=c++17', 'buildtype=release' ],
 	license: 'GPL-3.0-or-later',
 )
 
-project_description = 'User/Session monitoring library'
+project_description = 'User/Session management library'
 
 #
 # Versioning

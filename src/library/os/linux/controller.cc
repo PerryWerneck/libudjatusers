@@ -30,6 +30,8 @@
 
 // https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/741
 
+ #define LOG_DOMAIN "userlist"
+
  #include <config.h>
  #include <udjat/defs.h>
  #include <udjat/tools/user/session.h>
@@ -85,8 +87,8 @@
 		return *session;
 	}
 
-	static const ModuleInfo modinfo{"User list handler"};
-	User::List::List() : Udjat::Service{modinfo} {
+	User::List::List() : Udjat::Service{"userlist"} {
+
 		debug("Starting user list");
 
 		for(size_t ix = 0; ix < N_ELEMENTS(listeners); ix++) {
@@ -95,7 +97,7 @@
 
 		efd = eventfd(0,0);
 		if(efd < 0) {
-			Logger::String{"Error getting eventfd: ",strerror(errno)}.error("users");
+			Logger::String{"Error getting eventfd: ",strerror(errno)}.error();
 		}
 	}
 

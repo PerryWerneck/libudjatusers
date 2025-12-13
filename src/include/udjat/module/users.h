@@ -17,28 +17,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+ #pragma once
 
  #include <config.h>
  #include <udjat/defs.h>
- #include <udjat/loader.h>
  #include <udjat/module/abstract.h>
- #include <udjat/tools/logger.h>
- #include <iostream>
+ #include <udjat/tools/actions/abstract.h>
+ 
+ #include <udjat/agent/user.h>
+ #include <udjat/tools/url.h>
 
- #ifndef DEBUG
-	#error "This test program requires DEBUG to be enabled"
- #endif // DEBUG
+ #include <memory>
 
- using namespace Udjat;
- using namespace std;
+ namespace Udjat {
 
- int main(int argc, char **argv) {
-	return loader(argc,argv,[](Application &app) -> int {
+	namespace User {
 
-		debug("Initializing " PACKAGE_NAME "...");
-		udjat_module_init();
-		debug("... initilization of " PACKAGE_NAME " is complete");
-		return 0;
-	});
+		/// @brief Generic user module.
+		class UDJAT_API Module : public Udjat::Module, private Udjat::User::Agent::Factory, private Action::Factory {	
+		protected:
+			std::shared_ptr<Abstract::Agent> AgentFactory(const XML::Node &node) const override;
+			std::shared_ptr<Action> ActionFactory(const XML::Node &node) const override;
+
+		public:
+
+			static Udjat::Module * Factory(const char *name = "user", const char *description = "User/Session management module");
+
+			Module(const char *name = "users", const char *description = "User/Session management module");
+			~Module() override;
+
+		};
+
+	}
+
  }
-

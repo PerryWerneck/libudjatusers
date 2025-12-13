@@ -32,11 +32,11 @@
 		-->
 	
 		<!-- Activate when user is active on service start -->
-		<script type='url' name='start' trigger-event='Already active' action='post' url='http://localhost'>
+		<script type='url' name='start' trigger-event='Already active' http-method='post' url='http://localhost'>
 			{"user":"${username}","macaddress":"${macaddress}"}
 		</script>
 
-		<script type='url' name='lock' trigger-event='lock' action='post' url='http://localhost'>
+		<script type='url' name='lock' trigger-event='lock' http-method='post' url='http://localhost'>
 			{"user":"${username}","macaddress":"${macaddress}"}
 		</script>
 
