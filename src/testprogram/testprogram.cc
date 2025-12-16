@@ -25,10 +25,6 @@
  #include <udjat/tools/logger.h>
  #include <iostream>
 
- #ifndef DEBUG
-	#error "This test program requires DEBUG to be enabled"
- #endif // DEBUG
-
  using namespace Udjat;
  using namespace std;
 
