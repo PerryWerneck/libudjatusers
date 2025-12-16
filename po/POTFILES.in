@@ -16,4 +16,5 @@ src/module/init.cc
 src/include/udjat/agent/user.h
 src/include/udjat/tools/user/list.h
 src/include/udjat/tools/user/session.h
+src/include/udjat/module/users.h
 src/include/private/linux.h

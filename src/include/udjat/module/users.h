@@ -22,7 +22,7 @@
  #include <config.h>
  #include <udjat/defs.h>
  #include <udjat/module/abstract.h>
- #include <udjat/tools/actions/abstract.h>
+ #include <udjat/action.h>
  
  #include <udjat/agent/user.h>
  #include <udjat/tools/url.h>
