@@ -37,8 +37,8 @@
 
  namespace Udjat {
 
-	void User::List::refresh() noexcept {
-		PostMessage(hwnd,WM_REFRESH,0,0);
+	void User::List::refresh(bool ondemand) noexcept {
+		PostMessage(hwnd,WM_REFRESH,ondemand,0);
 	}
 
 	/// @brief Find session (Requires an active guard!!!)

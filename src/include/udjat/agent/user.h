@@ -76,7 +76,7 @@
 			Agent(const XML::Node &node);
 			virtual ~Agent();
 
-			bool refresh() override;
+			bool refresh(bool) override;
 
 			/// @brief Process event.
 			/// @return true if an alert was activated.

@@ -204,7 +204,7 @@ inline std::string n2hexstr(I w, size_t hex_len = sizeof(I)<<1) {
 
 	}
 
-	bool User::Agent::refresh() {
+	bool User::Agent::refresh(bool) {
 
 		time_t seconds = 600;
 
