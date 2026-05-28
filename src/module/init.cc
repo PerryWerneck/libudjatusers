@@ -32,14 +32,16 @@
  using namespace Udjat;
 
  /// @brief Register udjat user module.
- Udjat::Module * udjat_module_init() {
+ Udjat::Module * udjat_module_init(const XML::Node &) {
 	return User::Module::Factory("users","User/Session management module");
  }
 
 namespace Udjat {
 
 	Udjat::Module * User::Module::Factory(const char *name, const char *description) {
-		return new User::Module{name, description};
+		auto module = new User::Module{name, description};
+		module->autoclean();
+		return module;
 	}
 
 	User::Module::Module(const char *name, const char *description) : Udjat::Module(name, description), Abstract::Agent::Factory(name), Action::Factory{name} {

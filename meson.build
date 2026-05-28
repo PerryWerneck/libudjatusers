@@ -73,6 +73,7 @@ compiler_flags = [
   '-fvisibility=hidden',
   '-fPIC',
   '-DHAVE_CONFIG_H=1',
+  '-Wno-overloaded-virtual',
   '-DBUILD_DATE='+time_epoch,
 ]
 
