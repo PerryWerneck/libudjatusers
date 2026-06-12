@@ -27,12 +27,13 @@
  #include <udjat/agent/user.h>
  #include <udjat/tools/user/list.h>
  #include <udjat/module/users.h>
+ #include <udjat/tools/properties.h>
 
  using namespace std;
  using namespace Udjat;
 
  /// @brief Register udjat user module.
- Udjat::Module * udjat_module_init(const XML::Node &) {
+ Udjat::Module * udjat_module_init(const Udjat::Properties &) {
 	return User::Module::Factory("users","User/Session management module");
  }
 

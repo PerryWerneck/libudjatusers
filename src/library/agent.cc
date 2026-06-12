@@ -160,19 +160,6 @@
 
 	}
 
-/*
-#ifdef DEBUG
-template <typename I> 
-inline std::string n2hexstr(I w, size_t hex_len = sizeof(I)<<1) {
-    static const char* digits = "0123456789ABCDEF";
-    std::string rc(hex_len,'0');
-    for (size_t i=0, j=(hex_len-1)*4 ; i<hex_len; ++i,j-=4)
-        rc[i] = digits[(w>>j) & 0x0f];
-    return rc;
-}
-#endif 
-*/
-
 	bool User::Agent::push_back(const XML::Node &node, std::shared_ptr<Abstract::Object> object){
 
 		auto activatable = std::dynamic_pointer_cast<Activatable>(object);
@@ -193,7 +180,7 @@ inline std::string n2hexstr(I w, size_t hex_len = sizeof(I)<<1) {
 
 		auto &proxy = proxies.emplace_back(node,event,activatable);
 
-		debug("Filters: ",std::to_string(proxy.filter).c_str()," (",n2hexstr((uint16_t) proxy.filter).c_str(),")");
+		debug("Filters: ",std::to_string(proxy.filter).c_str()," (",std::to_hex_string((uint16_t) proxy.filter).c_str(),")");
 
 		if(event & User::pulse) {
 			proxy.timer = XML::AttributeFactory(node,"interval").as_uint(proxy.timer);
