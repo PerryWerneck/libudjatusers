@@ -21,7 +21,7 @@
 
  #include <config.h>
  #include <udjat/defs.h>
- #include <udjat/module/abstract.h>
+ #include <udjat/module.h>
  #include <udjat/action.h>
  
  #include <udjat/agent/user.h>
@@ -36,12 +36,11 @@
 		/// @brief Generic user module.
 		class UDJAT_API Module : public Udjat::Module, private Udjat::User::Agent::Factory, private Action::Factory {	
 		protected:
-			std::shared_ptr<Abstract::Agent> AgentFactory(const XML::Node &node) const override;
 			std::shared_ptr<Action> ActionFactory(const XML::Node &node) const override;
 
 		public:
 
-			static Udjat::Module * Factory(const char *name = "user", const char *description = "User/Session management module");
+			static Udjat::Module * Factory(const char *name = "users", const char *description = "User/Session management module");
 
 			Module(const char *name = "users", const char *description = "User/Session management module");
 			~Module() override;

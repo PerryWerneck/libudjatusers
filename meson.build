@@ -50,7 +50,7 @@ libudjat = dependency(
   'libudjat',
   required: true, 
   version: '>=2.7.0',
-  fallback: ['libudjat', 'static_library'],
+  fallback: ['libudjat'],
 )
 
 lib_deps = [
@@ -118,6 +118,7 @@ lib_src = [
   'src/library/events.cc',
   'src/library/list.cc',
   'src/library/session.cc',
+  'src/library/module.cc',
 ]
 
 module_src = [
@@ -189,7 +190,7 @@ else
     dependency(
       'libudjatdbus',
       required: true, 
-      fallback: ['libudjatdbus', 'static_library'],
+      fallback: ['libudjatdbus'],
     ),
     dependency('libsystemd'),
   ]

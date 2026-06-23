@@ -3,3 +3,5 @@ url = https://github.com/PerryWerneck/libudjatdbus
 revision = develop
 depth = 1
 
+[provide]
+libudjatdbus = static_library

@@ -76,7 +76,7 @@
 
 		}
 
-		debug("User::EventFactory: returning event mask '", to_hex_string((uint16_t) rc).c_str(), "'");
+		// debug("User::EventFactory: returning event mask '", to_hex_string((uint16_t) rc).c_str(), "'");
 		return (User::Event) rc;
 
 	}

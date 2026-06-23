@@ -68,6 +68,16 @@
 			} timers;
 
 		public:
+
+			class UDJAT_API Factory : public Udjat::Abstract::Agent::Factory {
+			public:
+				Factory(const char *name = "users") : Udjat::Abstract::Agent::Factory{name} {
+				}
+
+				std::shared_ptr<Abstract::Agent> AgentFactory(const XML::Node &node) const override;
+
+			};
+
 			Agent(const Agent&) = delete;
 			Agent& operator=(const Agent &) = delete;
 			Agent(Agent &&) = delete;

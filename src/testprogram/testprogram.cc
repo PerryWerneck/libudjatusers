@@ -20,22 +20,11 @@
 
  #include <config.h>
  #include <udjat/defs.h>
- #include <udjat/loader.h>
- #include <udjat/module/abstract.h>
- #include <udjat/tools/logger.h>
- #include <iostream>
-
+ #include <udjat/tools/loader.h>
+ 
  using namespace Udjat;
- using namespace std;
 
- int main(int argc, char **argv) {
-
-	return loader(argc,argv,[](Application &app) -> int {
-
-		debug("Initializing " PACKAGE_NAME "...");
-		udjat_module_init();
-		debug("... initilization of " PACKAGE_NAME " is complete");
-		return 0;
-	});
+ int main(const int argc, const char **argv) {
+	return loader(argc,argv);
  }
 

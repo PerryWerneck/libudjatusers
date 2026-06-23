@@ -4,6 +4,7 @@
 
 	<module name='civetweb' required='no' />
 	<module name='information' required='no' />
+	<module path='.build/udjat-module-users.so' required='yes' />
 
 	<!-- attribute name='url' value='sqlite+http://localhost' / -->
 	<!-- attribute name='alert-url' value='http://localhost/udjat/alert/user/${username}/${name}' / -->

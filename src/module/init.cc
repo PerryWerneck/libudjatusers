@@ -19,75 +19,17 @@
 
  #include <config.h>
  #include <udjat/defs.h>
- #include <udjat/module/abstract.h>
- #include <udjat/agent/abstract.h>
- #include <udjat/action.h>
- #include <udjat/tools/report.h>
- #include <udjat/module/abstract.h>
- #include <udjat/agent/user.h>
- #include <udjat/tools/user/list.h>
+ #include <udjat/module.h>
  #include <udjat/module/users.h>
- #include <udjat/tools/properties.h>
 
- using namespace std;
  using namespace Udjat;
 
  /// @brief Register udjat user module.
  Udjat::Module * udjat_module_init(const Udjat::Properties &) {
-	return User::Module::Factory("users","User/Session management module");
+#ifdef LIBUDJAT_STATIC
+        throw logic_error("Cant use modules on static libudjat");
+#else 	
+	return User::Module::Factory();
+#endif // LIBUDJAT_STATIC
  }
 
-namespace Udjat {
-
-	Udjat::Module * User::Module::Factory(const char *name, const char *description) {
-		auto module = new User::Module{name, description};
-		module->autoclean();
-		return module;
-	}
-
-	User::Module::Module(const char *name, const char *description) : Udjat::Module(name, description), Abstract::Agent::Factory(name), Action::Factory{name} {
-		// Get User list singleton.
-		debug("Loading module '",name,"'");
-		User::List::getInstance();
-	};
-
-	User::Module::~Module() {
-	}
-
-	std::shared_ptr<Abstract::Agent> User::Module::AgentFactory(const XML::Node &node) const {
-		return make_shared<User::Agent>(node);
-	}
-
-	std::shared_ptr<Action> User::Module::ActionFactory(const XML::Node &node) const {
-
-		class UserListAction : public Udjat::Action {
-		public:
-			UserListAction(const XML::Node &node) : Udjat::Action{node} {
-			}
-
-			~UserListAction() override {
-			}
-
-			int call(Udjat::Request &request, Udjat::Response &response, bool except) {
-				return exec(response,except,[&](){
-
-					auto &report = response.ReportFactory("name","remote","locked","active","state",nullptr);
-					for(auto session : User::List::getInstance()) {
-						report.push_back(session->to_string());
-						report.push_back(session->remote());
-						report.push_back(session->locked());
-						report.push_back(session->active());
-						report.push_back(std::to_string(session->state()));
-					}
-
-					return 0;
-				});
-			}
-
-		};
-
-		return make_shared<UserListAction>(node);
-	}
-
-
-}	

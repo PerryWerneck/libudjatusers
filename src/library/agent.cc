@@ -29,7 +29,13 @@
 
  namespace Udjat {
 
+	std::shared_ptr<Abstract::Agent> User::Agent::Factory::AgentFactory(const XML::Node &node) const {
+		return make_shared<User::Agent>(node);
+	}
+
 	User::Agent::Agent(const XML::Node &node) : Abstract::Agent(node) {
+
+		debug("-----> Building user agent");
 
 		User::List::getInstance().push_back(this);
 
@@ -160,10 +166,11 @@
 
 	}
 
-	bool User::Agent::push_back(const XML::Node &node, std::shared_ptr<Abstract::Object> object){
+	bool User::Agent::push_back(const XML::Node &node, std::shared_ptr<Abstract::Object> object) {
 
 		auto activatable = std::dynamic_pointer_cast<Activatable>(object);
 		if(!activatable) {
+			debug("Node '",node.node_name(),"' is not activatable");
 			return super::push_back(node,object);
 		}
 
@@ -180,7 +187,7 @@
 
 		auto &proxy = proxies.emplace_back(node,event,activatable);
 
-		debug("Filters: ",std::to_string(proxy.filter).c_str()," (",std::to_hex_string((uint16_t) proxy.filter).c_str(),")");
+		// debug("Filters: ",std::to_string(proxy.filter).c_str()," (",std::to_hex_string((uint16_t) proxy.filter).c_str(),")");
 
 		if(event & User::pulse) {
 			proxy.timer = XML::AttributeFactory(node,"interval").as_uint(proxy.timer);
