@@ -120,7 +120,7 @@
 		return *this;
 	}
 
-	Udjat::Value & User::Session::getProperties(Udjat::Value &value) const {
+	Udjat::Variant & User::Session::get_properties(Udjat::Variant &value) const {
 
 		value["username"] = to_string();
 		value["remote"] = remote();
@@ -146,7 +146,7 @@
 
 	}
 
-	bool User::Session::getProperty(const char *key, std::string &value) const {
+	bool User::Session::get_property(const char *key, Udjat::Variant &value) const {
 
 		if(!strcasecmp(key,"username")) {
 			value = to_string();
@@ -154,17 +154,17 @@
 		};
 
 		if(!strcasecmp(key,"remote")) {
-			value = remote() ? "true" : "false";
+			value = remote();
 			return true;
 		};
 
 		if(!strcasecmp(key,"locked")) {
-			value = locked() ? "true" : "false";
+			value = locked();
 			return true;
 		};
 
 		if(!strcasecmp(key,"active")) {
-			value = active() ? "true" : "false";
+			value = active();
 			return true;
 		};
 
@@ -203,12 +203,12 @@
 			return true;
 		}
 
-#ifdef _WIN32
 		if(!strcasecmp(key,"domain")) {
+#ifdef _WIN32
 			value = domain();
+#endif // _WIN32
 			return true;
 		}
-#endif // _WIN32
 
 		return false;
 	}

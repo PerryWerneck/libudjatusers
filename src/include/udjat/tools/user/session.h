@@ -169,8 +169,8 @@
 
 			const char * name(bool update) const noexcept;
 
-			bool getProperty(const char *key, std::string &value) const override;
-			Value & getProperties(Value &value) const override;
+			bool get_property(const char *key, Variant &value) const override;
+			Variant & get_properties(Variant &value) const override;
 
 			/// @brief Test session type.
 			/// @param type The type with options to check.
