@@ -21,7 +21,7 @@
  #include <udjat/defs.h>
  #include <udjat/tools/intl.h>
  #include <udjat/tools/user/session.h>
- #include <udjat/tools/abstract/object.h>
+ #include <udjat/tools/object.h>
  #include <udjat/alert.h>
  #include <udjat/agent/user.h>
  #include <udjat/tools/logger.h>
@@ -66,39 +66,52 @@
 
  namespace Udjat {
 
-	User::Session::Type User::Session::TypeFactory(const XML::Node &node) {
+	User::Session::Type User::Session::TypeFactory(const Udjat::Properties &props) {
 
 		uint16_t value = 0xFFFF;
 		uint16_t mask = 0x01;
 		
 		for(const auto &type : typenames) {
-			auto attr = XML::AttributeFactory(node,String{"allow-on-",type.attrname,"-session"}.c_str());
-			if(!attr) {
-				attr = XML::AttributeFactory(node,String{"on-",type.attrname,"-session"}.c_str());
+
+			for(const String &key : { String{"allow-on-",type.attrname,"-session"}, String{"on-",type.attrname,"-session"}, String{type.attrname,"-session"}}) {
+				if(props.contains(key.c_str())) {
+					if(props.get(key.c_str(),type.flag)) {
+						value |= mask;
+					} else {
+						value &= (~mask);
+					}
+					break;
+				}
 			}
-			if(!attr) {
-				attr = XML::AttributeFactory(node,String{type.attrname,"-session"}.c_str());
-			}
-			if(attr.as_bool(type.flag)) {
-				value |= mask;
-			} else {
-				value &= (~mask);
-			}
+
+			// auto attr = XML::AttributeFactory(node,String{"allow-on-",type.attrname,"-session"}.c_str());
+			// if(!attr) {
+			// 	attr = XML::AttributeFactory(node,String{"on-",type.attrname,"-session"}.c_str());
+			// }
+			// if(!attr) {
+			// 	attr = XML::AttributeFactory(node,String{type.attrname,"-session"}.c_str());
+			// }
+			// if(attr.as_bool(type.flag)) {
+			// 	value |= mask;
+			// } else {
+			// 	value &= (~mask);
+			// }
+
 			mask <<= 1;
 		} 
 
 		return (User::Session::Type) value;
 	}
 
-	User::Agent::Proxy::Proxy(const XML::Node &node, const User::Event e, std::shared_ptr<Activatable> a)
-		: events{e},filter{User::Session::TypeFactory(node)},activatable{a} {
+	User::Agent::Proxy::Proxy(const Udjat::Properties &props, const User::Event e, std::shared_ptr<Activatable> a)
+		: events{e},filter{User::Session::TypeFactory(props)},activatable{a} {
 
 		if(dynamic_cast<Udjat::Alert *>(activatable.get())) {
 			throw std::system_error(ENOTSUP, std::system_category(),"Unable to handle user based alerts");
 		}
 
-		classname = String{node,"session-class","user"}.as_quark();
-		servicename = String{node,"session-service"}.as_quark();
+		classname = props.get("session-class","user").as_quark();
+		servicename = props.get("session-service").as_quark();
 						
 	}
 

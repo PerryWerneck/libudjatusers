@@ -1,7 +1,7 @@
 [wrap-git]
 url = https://github.com/PerryWerneck/libudjat
-revision = develop
+revision = v3
 depth = 1
 
 [provide]
-libudjat = dynamic_library
+libudjat = libudjat_dep

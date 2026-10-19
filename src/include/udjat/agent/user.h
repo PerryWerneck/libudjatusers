@@ -23,10 +23,11 @@
 
  #pragma once
  #include <udjat/defs.h>
- #include <udjat/tools/xml.h>
- #include <udjat/agent/abstract.h>
+ #include <udjat/tools/properties.h>
+ #include <udjat/agent.h>
  #include <udjat/tools/activatable.h>
  #include <udjat/tools/user/session.h>
+ #include <udjat/tools/variant.h>
 				
  namespace Udjat {
 
@@ -50,7 +51,7 @@
 
 				time_t timer = 0;	///< @brief Session idle time to emit 'pulse' events (if enabled).
 
-				Proxy(const XML::Node &node, const User::Event event, std::shared_ptr<Activatable> activatable);
+				Proxy(const Udjat::Properties &props, const User::Event event, std::shared_ptr<Activatable> activatable);
 
 				void activate(const User::Session &session, const Abstract::Object &agent) const noexcept;
 
@@ -74,7 +75,7 @@
 				Factory(const char *name = "users") : Udjat::Abstract::Agent::Factory{name} {
 				}
 
-				std::shared_ptr<Abstract::Agent> AgentFactory(const XML::Node &node) const override;
+				std::shared_ptr<Abstract::Agent> AgentFactory(const Udjat::Properties &props) const override;
 
 			};
 
@@ -83,7 +84,7 @@
 			Agent(Agent &&) = delete;
 			Agent & operator=(Agent &&) = delete;
 
-			Agent(const XML::Node &node);
+			Agent(const Udjat::Properties &props);
 			virtual ~Agent();
 
 			bool refresh(bool) override;
@@ -96,11 +97,11 @@
 			/// @param node The activatable description.
 			/// @param activatable The activatable built for this event.
 			/// @return true if the event was pushed.
-			bool push_back(const XML::Node &node, std::shared_ptr<Abstract::Object> object) override;
+			bool push_back(const Udjat::Properties &props, std::shared_ptr<Abstract::Object> object) override;
 
-			Value & get(Value &value) const override;
+			Variant & get(Variant &value) const override;
 
-			bool getProperties(const char *path, Value &value) const override;
+			bool get_properties(const char *path, Udjat::Variant &value) const override;
 
 			/// @brief Get Agent value (seconds since last alert);
 			time_t get() const noexcept;

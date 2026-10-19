@@ -20,8 +20,8 @@
 project(
 	'udjatusers', 
 	['cpp'],
-	version: '2.2.0',
-	default_options : ['c_std=c11', 'cpp_std=c++17', 'buildtype=release' ],
+	version: '3.0.0',
+	default_options : [ 'c_std=c11', 'cpp_std=c++17', 'buildtype=release', 'default_library=shared' ],
 	license: 'GPL-3.0-or-later',
 )
 
@@ -49,7 +49,7 @@ subdir('po')
 libudjat = dependency(
   'libudjat',
   required: true, 
-  version: '>=2.7.0',
+  version: '>=3.0.0',
   fallback: ['libudjat'],
 )
 
@@ -119,6 +119,7 @@ lib_src = [
   'src/library/list.cc',
   'src/library/session.cc',
   'src/library/module.cc',
+  'src/library/testcases.cc',
 ]
 
 module_src = [

@@ -20,9 +20,9 @@
  #include <config.h>
  #include <udjat/defs.h>
  #include <udjat/module.h>
- #include <udjat/agent/abstract.h>
+ #include <udjat/agent.h>
  #include <udjat/action.h>
- #include <udjat/tools/report.h>
+ #include <udjat/tools/variant.h>
  #include <udjat/agent/user.h>
  #include <udjat/tools/user/list.h>
  #include <udjat/module/users.h>
@@ -49,11 +49,11 @@
 	User::Module::~Module() {
 	}
 
-	std::shared_ptr<Action> User::Module::ActionFactory(const XML::Node &node) const {
+	std::shared_ptr<Action> User::Module::ActionFactory(const Udjat::Properties &props) const {
 
 		class UserListAction : public Udjat::Action {
 		public:
-			UserListAction(const XML::Node &node) : Udjat::Action{node} {
+			UserListAction(const Udjat::Properties &props) : Udjat::Action{props} {
 			}
 
 			~UserListAction() override {
@@ -62,13 +62,13 @@
 			int call(Udjat::Request &request, Udjat::Response &response, bool except) {
 				return exec(response,except,[&](){
 
-					auto &report = response.ReportFactory("name","remote","locked","active","state",nullptr);
 					for(auto session : User::List::getInstance()) {
-						report.push_back(session->to_string());
-						report.push_back(session->remote());
-						report.push_back(session->locked());
-						report.push_back(session->active());
-						report.push_back(std::to_string(session->state()));
+						auto row = response.append(Variant::ValueMap);
+						row["name"] = session->to_string();
+						row["remote"] = session->remote();
+						row["locked"] = session->locked();
+						row["active"] = session->active();
+						row["state"] = std::to_string(session->state());
 					}
 
 					return 0;
@@ -77,7 +77,7 @@
 
 		};
 
-		return make_shared<UserListAction>(node);
+		return std::make_shared<UserListAction>(props);
 	}
 
  }	

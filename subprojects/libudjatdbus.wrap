@@ -1,7 +1,7 @@
 [wrap-git]
 url = https://github.com/PerryWerneck/libudjatdbus
-revision = develop
+revision = v3
 depth = 1
 
 [provide]
-libudjatdbus = static_library
+libudjatdbus = libudjatdbus_dep

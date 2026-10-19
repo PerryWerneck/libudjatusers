@@ -63,7 +63,7 @@
 		/// @brief Create an event id.
 		/// @param names The list of event names delimited by ','
 		/// @return The event id mixing all names.
-		// UDJAT_API Event EventFactory(const XML::Node &node);
+		// UDJAT_API Event EventFactory(const Udjat::Properties &props);
 
 		/// @brief Session state, as reported by logind.
 		/// @see sd_session_get_state
@@ -142,7 +142,7 @@
 				All				= 0xFFFF
 			};
 
-			static Type TypeFactory(const XML::Node &node);
+			static Type TypeFactory(const Udjat::Properties &props);
 
 			Session();
 			virtual ~Session();

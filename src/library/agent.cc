@@ -19,21 +19,22 @@
 
  #include <config.h>
  #include <udjat/defs.h>
- #include <udjat/agent/abstract.h>
+ #include <udjat/agent.h>
  #include <udjat/agent/user.h>
  #include <udjat/tools/user/list.h>
  #include <udjat/alert.h>
  #include <udjat/tools/string.h>
+ #include <memory>
 
  using namespace std;
 
  namespace Udjat {
 
-	std::shared_ptr<Abstract::Agent> User::Agent::Factory::AgentFactory(const XML::Node &node) const {
-		return make_shared<User::Agent>(node);
+	std::shared_ptr<Abstract::Agent> User::Agent::Factory::AgentFactory(const Udjat::Properties &props) const {
+		return make_shared<User::Agent>(props);
 	}
 
-	User::Agent::Agent(const XML::Node &node) : Abstract::Agent(node) {
+	User::Agent::Agent(const Udjat::Properties &props) : Abstract::Agent(props) {
 
 		debug("-----> Building user agent");
 
@@ -43,7 +44,7 @@
 			properties.icon = "user-info";
 		}
 
-		timers.max_pulse_check = getAttribute(node, "user-session", "max-update-timer", timers.max_pulse_check);
+		timers.max_pulse_check = props.get("max-update-timer", timers.max_pulse_check);
 
 	}
 
@@ -75,11 +76,11 @@
 			virtual ~Object() {				
 			}
 
-			bool getProperty(const char *key, std::string &value) const override {
-				if(session.getProperty(key,value)) {
+			bool get_property(const char *key, Variant &value) const override {
+				if(session.get_property(key,value)) {
 					return true;
 				}
-				return agent.getProperty(key,value);
+				return agent.get_property(key,value);
 			}
 
 		};
@@ -90,7 +91,7 @@
 
 		} catch(const std::exception &e) {
 
-			error() << e.what() << endl;
+			Logger::String{e.what()}.error(name());
 
 		}
 
@@ -166,31 +167,31 @@
 
 	}
 
-	bool User::Agent::push_back(const XML::Node &node, std::shared_ptr<Abstract::Object> object) {
+	bool User::Agent::push_back(const Udjat::Properties &props, std::shared_ptr<Abstract::Object> object) {
 
 		auto activatable = std::dynamic_pointer_cast<Activatable>(object);
 		if(!activatable) {
-			debug("Node '",node.node_name(),"' is not activatable");
-			return super::push_back(node,object);
+			debug("Node '",props.node_name(),"' is not activatable");
+			return super::push_back(props,object);
 		}
 
-		String trigger{node,"trigger-event"};
+		String trigger{props,"trigger-event"};
 		if(trigger.empty()) {
-			trigger = String{node,"name"};
+			trigger = props["name"];
 		}
 
 		auto event = User::EventFactory(trigger.c_str());
 		if(!event) {
 			// It's not an user event, call the default method.
-			return super::push_back(node,activatable);
+			return super::push_back(props,activatable);
 		}
 
-		auto &proxy = proxies.emplace_back(node,event,activatable);
+		auto &proxy = proxies.emplace_back(props,event,activatable);
 
 		// debug("Filters: ",std::to_string(proxy.filter).c_str()," (",std::to_hex_string((uint16_t) proxy.filter).c_str(),")");
 
 		if(event & User::pulse) {
-			proxy.timer = XML::AttributeFactory(node,"interval").as_uint(proxy.timer);
+			proxy.timer = props.get("interval",proxy.timer);
 			timer(min(timer(),proxy.timer));
 		}
 
@@ -255,9 +256,9 @@
 
 	}
 
-	bool User::Agent::getProperties(const char *path, Value &value) const {
+	bool User::Agent::get_properties(const char *path, Variant &value) const {
 
-		if(super::getProperties(path,value)) {
+		if(super::get_properties(path,value)) {
 			return true;
 		}
 
@@ -265,7 +266,7 @@
 		for(auto user : User::List::getInstance()) {
 
 			if(!strcasecmp(user->name(),path)) {
-				user->getProperties(value);
+				user->get_properties(value);
 				return true;
 			}
 

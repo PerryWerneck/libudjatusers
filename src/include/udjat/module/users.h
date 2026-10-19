@@ -36,7 +36,7 @@
 		/// @brief Generic user module.
 		class UDJAT_API Module : public Udjat::Module, private Udjat::User::Agent::Factory, private Action::Factory {	
 		protected:
-			std::shared_ptr<Action> ActionFactory(const XML::Node &node) const override;
+			std::shared_ptr<Action> ActionFactory(const Udjat::Properties &props) const override;
 
 		public:
 

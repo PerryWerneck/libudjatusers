@@ -12,6 +12,7 @@ src/library/agent.cc
 src/library/alert.cc
 src/library/events.cc
 src/library/session.cc
+src/library/module.cc
 src/module/init.cc
 src/include/udjat/agent/user.h
 src/include/udjat/tools/user/list.h
