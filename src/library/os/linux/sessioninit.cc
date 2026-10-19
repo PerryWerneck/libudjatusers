@@ -100,18 +100,18 @@
 							if(active) {
 
 								flags.locked = true;
-								info() << "gnome-screensaver is active" << endl;
+								Logger::String{"gnome-screensaver is active"}.info(name());
 
 							} else {
 
-								info() << "gnome-screensaver is not active" << endl;
+								Logger::String{"gnome-screensaver is not active"}.info(name());
 
 							}
 
 						} else {
 
-							error() << "Error calling org.gnome.ScreenSaver.GetActiveTime: "  << message.error_message() << endl;
-
+							Logger::String{"Error calling org.gnome.ScreenSaver.GetActiveTime: ",message.error_message()}.error(name());
+	
 						}
 					}
 				);
@@ -131,7 +131,7 @@
 						message.pop(locked);
 						
 						if(locked != flags.locked) {
-							info() << "Gnome screensaver is now " << (locked ? "active" : "inactive") << endl;
+							Logger::String{"Gnome screensaver is now ",(locked ? "active" : "inactive")}.info(name());
 							flags.locked = locked;
 							ThreadPool::getInstance().push("user-lock-emission",[this,locked](){
 								emit( (locked ? User::lock : User::unlock) );

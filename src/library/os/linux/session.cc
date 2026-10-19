@@ -62,7 +62,7 @@
 			int rc = sd_session_is_remote(sid.c_str());
 
 			if(rc < 0) {
-				error() << "sd_session_is_remote(" << sid << "): " << strerror(rc) << " (rc=" << rc << ")" << endl;
+				Logger::String{"sd_session_is_remote(",sid,"): ",strerror(rc)," (rc=",rc,")"}.error(name());
 				return false;
 			}
 
@@ -85,9 +85,9 @@
 
 			rc = -rc;
 			if(rc == ENXIO) {
-				info() << "sd_session_is_active(" << sid << "): " << strerror(rc) << " (rc=" << rc << "), assuming inactive" << endl;
+				Logger::String{"sd_session_is_active(",sid,"): ",strerror(rc)," (rc=",rc,"), assuming inactive"}.info(name());
 			} else {
-				error() << "sd_session_is_active(" << sid << "): " << strerror(rc) << " (rc=" << rc << ")" << endl;
+				Logger::String{"sd_session_is_active(",sid,"): ",strerror(rc)," (rc=",rc,")"}.error(name());
 			}
 
 			return false;
@@ -193,7 +193,7 @@
 		int rc = sd_session_get_service(sid.c_str(),&servicename);
 		if(rc < 0 || !servicename) {
 			rc = -rc;
-			warning() << "sd_session_get_service(" << sid << "): " << strerror(rc) << " (rc=" << rc << "), assuming empty" << endl;
+			Logger::String{"sd_session_get_service(",sid,"): ",strerror(rc)," (rc=",rc,"), assuming empty"}.warning(name());
 			return "";
 		}
 
@@ -224,7 +224,7 @@
 		int rc = sd_session_get_class(sid.c_str(),&classname);
 		if(rc < 0 || !classname) {
 			rc = -rc;
-			warning() << "sd_session_get_class(" << sid << "): " << strerror(rc) << " (rc=" << rc << "), assuming empty" << endl;
+			Logger::String{"sd_session_get_class(",sid,"): ",strerror(rc)," (rc=",rc,"), assuming empty"}.warning(name());
 			return "";
 		}
 
