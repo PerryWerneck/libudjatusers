@@ -181,19 +181,21 @@ else
   lib_src += [
     'src/library/os/linux/environment.cc',
     'src/library/os/linux/sessiondeinit.cc',
-    'src/library/os/linux/controller.cc',
+    'src/library/os/linux/list.cc',
     'src/library/os/linux/session.cc',
     'src/library/os/linux/sessioninit.cc',
   ]
 
   app_conf.set('HAVE_DBUS', 1)
+  app_conf.set('HAVE_SYSTEMD', 1)
+
   lib_deps += [
     dependency(
       'libudjatdbus',
       required: true, 
       fallback: ['libudjatdbus'],
     ),
-    dependency('libsystemd'),
+    dependency('libsystemd',required:true),
   ]
 
 endif

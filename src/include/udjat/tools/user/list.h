@@ -61,6 +61,11 @@
 			void start() override;
 			void stop() override;
 
+			/// Emit event on all sessions using a separated thread.
+			/// @param event The event to emit.
+			/// @param logmessage The log message for event.
+			void emit(const User::Event event, const char *logmessage) noexcept;
+
 #ifdef _WIN32
 
 			HWND hwnd = 0;
@@ -84,22 +89,23 @@
 
 			void wakeup();
 
-			// D-Bus listeners;
-			void * listeners[6];
-
 #endif // _WIN32
 
 			/// @brief System is going to sleep.
-			void sleep();
+			inline void sleep() {
+				emit(User::sleep,"System is preparing to sleep");
+			}
+
 
 			/// @brief System is resuming from sleep.
-			void resume();
+			inline void resume() {
+				emit(User::resume,"System is resuming from sleep");
+			}
 
 			/// @brief System is shutting down.
-			void shutdown();
-
-			/// @brief Update session list from system.
-			//void refresh() noexcept;
+			inline void shutdown() {
+				emit(User::shutdown,"System is preparing to shutdown");
+			}
 
 			List();
 
@@ -117,10 +123,10 @@
 			virtual ~List();
 
 			/// @brief Start monitor, load sessions.
-			void activate();
+			virtual void activate();
 
 			/// @brief Stop monitor, unload sessions.
-			void deactivate();
+			virtual void deactivate();
 
 			bool for_each(const std::function<bool(User::Session &session)> &callback);
 
