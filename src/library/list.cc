@@ -168,65 +168,65 @@
 					cerr << "users\tError '" << e.what() << "' subscribing to org.freedesktop.login1.Manager.SessionNew" << endl;
 				}
 
-// 		try {
-// 			listeners[3] = &DBus::SystemBus::getInstance().subscribe(
-// 				"org.freedesktop.login1.Manager",
-// 				"SessionRemoved",
-// 				[this](DBus::Message &message) {
+				try {
+					subscriptions.push_back(DBus::SystemBus::getInstance().subscribe(
+						"org.freedesktop.login1.Manager",
+						"SessionRemoved",
+						[this](DBus::Message &message) {
 
-// 					debug("----------------------------------> SessionRemoved");
+							debug("----------------------------------> SessionRemoved");
 
-// 					string sid;
-// 					message.pop(sid);
+							string sid;
+							message.pop(sid);
 
-// 					string path;
-// 					message.pop(path);
+							string path;
+							message.pop(path);
 
-// 					cout << "users\t Session '" << sid << "' finished on path '" << path << "'" << endl;
+							Logger::String{"Session '",sid,"' finished on path '",path,"'"}.info();
 
-// 					ThreadPool::getInstance().push([this,sid](){
+							ThreadPool::getInstance().push([this,sid](){
 
-// 						lock_guard<recursive_mutex> lock(guard);
+								lock_guard<recursive_mutex> lock(guard);
 
-// 						for(Session *session : sessions) {
+								for(Session *session : sessions) {
 
-// 							if(strcmp(session->sid.c_str(),sid.c_str())) {
-// 								continue;
-// 							}
+									if(strcmp(session->sid.c_str(),sid.c_str())) {
+										continue;
+									}
 
-// 							if(session->flags.alive) {
+									if(session->flags.alive) {
 
-// 								if(Logger::enabled(Logger::Debug)) {
-// 									Logger::String{
-// 									"Sid=",session->sid,
-// 									" Uid=",session->userid(),
-// 									" System=",session->system(),
-// 									" type=",session->type(),
-// 									" display=",session->display(),
-// 									" remote=",session->remote(),
-// 									" service=",session->service(),
-// 									" class=",session->classname()
-// 									}.write(Logger::Debug,session->name());
-// 								}
-// 								session->emit(logoff);
-// 								session->flags.alive = false;
-// 							}
+										if(Logger::enabled(Logger::Debug)) {
+											Logger::String{
+											"Sid=",session->sid,
+											" Uid=",session->userid(),
+											" System=",session->system(),
+											" type=",session->type(),
+											" display=",session->display(),
+											" remote=",session->remote(),
+											" service=",session->service(),
+											" class=",session->classname()
+											}.write(Logger::Debug,session->name());
+										}
+										session->emit(logoff);
+										session->flags.alive = false;
+									}
 
-// 							session->deinit();
-// 							delete session;
+									session->deinit();
+									delete session;
 
-// 							break;
+									break;
 
-// 						}
+								}
 
-// 					});
-// 					return false;
+							});
+							return false;
 
-// 				}
-// 			);
-// 		} catch(const std::exception &e) {
-// 			cerr << "users\tError '" << e.what() << "' subscribing to org.freedesktop.login1.Manager.SessionRemoved" << endl;
-// 		}
+						}
+					));
+				} catch(const std::exception &e) {
+					Logger::String{"Error '",e.what(),"' subscribing to org.freedesktop.login1.Manager.SessionRemoved"}.error();
+				}
 
 // 		try {
 // 			listeners[4] = &DBus::SystemBus::getInstance().subscribe(
