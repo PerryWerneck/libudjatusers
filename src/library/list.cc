@@ -63,10 +63,12 @@
 
 				User::List::activate();
 
+				auto &bus = DBus::SystemBus::getInstance();
+
 				if(Config::Value<bool>("user-session","subscribe-prepare-for-sleep",true)) {
 
 					try {
-						subscriptions.push_back(DBus::SystemBus::getInstance().subscribe(
+						subscriptions.push_back(bus.subscribe(
 							"org.freedesktop.login1.Manager",
 							"PrepareForSleep",
 							[this](DBus::Message &message) {
@@ -93,7 +95,7 @@
 
 				if(Config::Value<bool>("user-session","subscribe-prepare-for-shutdown",true)) {
 					try {
-						subscriptions.push_back(DBus::SystemBus::getInstance().subscribe(
+						subscriptions.push_back(bus.subscribe(
 							"org.freedesktop.login1.Manager",
 							"PrepareForShutdown",
 							[this](DBus::Message &message) {
@@ -117,7 +119,7 @@
 				// https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html
 				try {
 
-					subscriptions.push_back(DBus::SystemBus::getInstance().subscribe(
+					subscriptions.push_back(bus.subscribe(
 						"org.freedesktop.login1.Manager",
 						"SessionNew",
 						[this](DBus::Message &message) {
@@ -165,11 +167,11 @@
 						}
 					));
 				} catch(const std::exception &e) {
-					cerr << "users\tError '" << e.what() << "' subscribing to org.freedesktop.login1.Manager.SessionNew" << endl;
+					Logger::String{"Error '", e.what(), "' subscribing to org.freedesktop.login1.Manager.SessionNew"}.error();
 				}
 
 				try {
-					subscriptions.push_back(DBus::SystemBus::getInstance().subscribe(
+					subscriptions.push_back(bus.subscribe(
 						"org.freedesktop.login1.Manager",
 						"SessionRemoved",
 						[this](DBus::Message &message) {
@@ -228,41 +230,47 @@
 					Logger::String{"Error '",e.what(),"' subscribing to org.freedesktop.login1.Manager.SessionRemoved"}.error();
 				}
 
-// 		try {
-// 			listeners[4] = &DBus::SystemBus::getInstance().subscribe(
-// 				"org.freedesktop.login1.Manager",
-// 				"UserNew",
-// 				[this](DBus::Message &message) {
+				try {
+					subscriptions.push_back(bus.subscribe(
+						"org.freedesktop.login1.Manager",
+						"UserNew",
+						[this](DBus::Message &message) {
 
-// 					debug("----------------------------------> UserNew");
+							debug("----------------------------------> UserNew");
 
-// 					return false;
+							return false;
 
-// 				}
-// 			);
-// 		} catch(const std::exception &e) {
-// 			cerr << "users\tError '" << e.what() << "' subscribing to org.freedesktop.login1.Manager.UserNew" << endl;
-// 		}
+						}
+					));
+				} catch(const std::exception &e) {
+					Logger::String{"Error '", e.what(), "' subscribing to org.freedesktop.login1.Manager.UserNew"}.error();
+				}
 
-// 		try {
-// 			listeners[5] = &DBus::SystemBus::getInstance().subscribe(
-// 				"org.freedesktop.login1.Manager",
-// 				"UserRemoved",
-// 				[this](DBus::Message &message) {
+				try {
+					subscriptions.push_back(bus.subscribe(
+						"org.freedesktop.login1.Manager",
+						"UserRemoved",
+						[this](DBus::Message &message) {
 
-// 					debug("----------------------------------> UserRemoved");
+							debug("----------------------------------> UserRemoved");
 
-// 					return false;
+							return false;
 
-// 				}
-// 			);
-// 		} catch(const std::exception &e) {
-// 			cerr << "users\tError '" << e.what() << "' subscribing to org.freedesktop.login1.Manager.UserRemoved" << endl;
-// 		}
+						}
+					));
+				} catch(const std::exception &e) {
+					Logger::String{"Error '",e.what(),"' subscribing to org.freedesktop.login1.Manager.UserRemoved"}.error();
+				}
 
 			}
 
 			void deactivate() override {
+
+				auto &bus = DBus::SystemBus::getInstance();
+				for(const auto subscription : subscriptions) {
+					bus.unsubscribe(subscription);
+				}
+				subscriptions.clear();
 
 				User::List::deactivate();
 
