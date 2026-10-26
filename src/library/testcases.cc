@@ -41,11 +41,12 @@
 			"User list monitor",
 			[](std::ostream &) {
 
+				auto &mainloop = MainLoop::getInstance();
 				auto &list = User::List::getInstance();
 
 				list.activate();
 
-				MainLoop::getInstance().run();
+				mainloop.run();
 
 				list.deactivate();
 
