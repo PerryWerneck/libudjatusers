@@ -23,6 +23,8 @@
 
  #include <udjat/tools/logger.h>
  #include <udjat/tools/testsuite.h>
+ #include <udjat/tools/user/list.h>
+ #include <udjat/tools/mainloop.h>
 
  #include <iostream>
 
@@ -36,8 +38,17 @@
 	suite.add(
 		PACKAGE_DESCRIPTION,
 		Case{
-			"Dummy",
+			"User list monitor",
 			[](std::ostream &) {
+
+				auto &list = User::List::getInstance();
+
+				list.activate();
+
+				MainLoop::getInstance().run();
+
+				list.deactivate();
+
 				return "Ok";
 			}
 		}

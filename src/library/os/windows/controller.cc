@@ -121,7 +121,7 @@
 			return;
 		}
 
-		cout << "users\tStarting user session monitor" << endl;
+		Logger::String{"Starting user session monitor"}.info();
 		hwnd = CreateWindow(
 			PACKAGE_NAME,
 			"user-monitor",

@@ -85,16 +85,18 @@
 
 		if(state != this->flags.state) {
 
-			cout	<< to_string()
-					<< "\tState changes from '"
-					<< this->flags.state
-					<< "' to '"
-					<< state << "' ("
-					<< ((int) this->flags.state)
-					<< "->"
-					<< ((int) state)
-					<< ")"
-					<< endl;
+			Logger::String {
+				"State changes from '",
+				std::to_string(this->flags.state),
+				"' to '",
+				std::to_string(state), 
+				"' (", 
+				((int) this->flags.state),
+				"->",
+				((int) state),
+				")"
+			}.trace(to_string().c_str());
+			
 			this->flags.state = state;
 
 			try {

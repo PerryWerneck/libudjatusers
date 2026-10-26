@@ -291,7 +291,7 @@
 
 		lock_guard<recursive_mutex> lock(guard);
 		for(auto session : sessions) {
-			cout << "users\tInitializing session @" << session->sid << endl;
+			Logger::String{"Initializing session @",session->sid}.info();
 			session->flags.alive = true;
 			session->emit(already_active);
 		}

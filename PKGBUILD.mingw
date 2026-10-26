@@ -19,7 +19,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 _realname="udjatusers"
-pkgver="2.2.0"
+pkgver="3.0.0"
 
 pkgname=${MINGW_PACKAGE_PREFIX}-${_realname}
 source=()

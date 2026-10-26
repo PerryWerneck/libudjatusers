@@ -406,7 +406,7 @@
 		if(monitor) {
 
 			debug("enabled: ",enabled);
-			cout << "users\tWaiting for termination of logind monitor" << endl;
+			Logger::String{"Waiting for termination of logind monitor"}.info();
 
 			wakeup();
 
@@ -414,7 +414,7 @@
 			deinit();
 			delete monitor;
 			monitor = nullptr;
-			cout << "users\tlogind monitor is now inactive" << endl;
+			Logger::String{"logind monitor is now inactive"}.info();
 		}
 
 		deinit(); // Just in case.
